@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.Desktop DB
+.VolumeIcon.icns
+
+# Node.js dependencies
+node_modules/
+
+# Build output
+build/

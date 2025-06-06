@@ -1,11 +1,24 @@
-.PHONY: setup build start
+lint-frontend:
+	make -C frontend lint
 
-setup:
-	npm install
-	cd frontend && npm install
+install:
+	npm ci
 
-build:
-	cd frontend && npm run build
+start-frontend:
+	make -C frontend start
+
+start-backend:
+	npx start-server -s ./frontend/dist
+
+deploy:
+	git push heroku main
 
 start:
-	npx start-server -p ${PORT:-5001} -s ./frontend/dist
+	make start-backend
+
+develop:
+	make start-backend & make start-frontend
+
+build:
+	rm -rf frontend/dist
+	npm run build

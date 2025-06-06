@@ -1,16 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik } from 'formik';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Alert } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { login as loginAPI } from '../../features/Auth/authAPI';
 
 export default function LoginPage() {
+    const navigate = useNavigate();
+    const [error, setError] = useState('');
+
     return (
         <div className="mx-auto" style={{ maxWidth: '400px' }}>
             <h2 className="mb-4 text-center">Login</h2>
+            {error && <Alert variant="danger">{error}</Alert>}
             <Formik
                 initialValues={{ username: '', password: '' }}
-                onSubmit={(values) => {
-                    // Submission handling will be implemented later
-                    console.log('Form values:', values);
+                onSubmit={async (values, { setSubmitting }) => {
+                    setError('');
+                    try {
+                        const token = await loginAPI(values.username, values.password);
+                        localStorage.setItem('token', token);
+                        navigate('/');
+                    } catch (e) {
+                        setError('Invalid username or password');
+                    } finally {
+                        setSubmitting(false);
+                    }
                 }}
             >
                 {({
@@ -18,7 +32,7 @@ export default function LoginPage() {
                       handleChange,
                       handleBlur,
                       handleSubmit,
-                      /* and other goodies */
+                      isSubmitting,
                   }) => (
                     <Form noValidate onSubmit={handleSubmit}>
                         <Row className="mb-3">
@@ -33,6 +47,7 @@ export default function LoginPage() {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter username"
+                                    disabled={isSubmitting}
                                 />
                             </Col>
                         </Row>
@@ -49,11 +64,17 @@ export default function LoginPage() {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter password"
+                                    disabled={isSubmitting}
                                 />
                             </Col>
                         </Row>
 
-                        <Button variant="primary" type="submit" className="w-100">
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            className="w-100"
+                            disabled={isSubmitting}
+                        >
                             Sign In
                         </Button>
                     </Form>
